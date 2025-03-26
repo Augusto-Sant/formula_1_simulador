@@ -26,10 +26,11 @@ public class Carro implements Runnable{
             } else {
                 this.velocidade = gerarVelocidade();
             }
+            System.out.println("> "+ identificacaoCarro + " km/h="+ this.velocidade);
 
             this.distanciaPercorrida += this.velocidade;
             if (this.distanciaPercorrida >= pista.distanciaTotal){
-                System.out.println("> "+ identificacaoCarro + " finalizou corrida");
+                System.out.println(identificacaoCarro + " finalizou corrida");
                 break;
             }
 
