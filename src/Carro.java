@@ -21,27 +21,44 @@ public class Carro implements Runnable{
     @Override
     public void run() {
         while (!terminouCorrida) {
-            if (this.pista.safetyCarRodando){
-                this.velocidade = 60;
-            } else {
-                this.velocidade = gerarVelocidade();
-            }
-            System.out.println("> "+ identificacaoCarro + " km/h="+ this.velocidade);
 
-            this.distanciaPercorrida += this.velocidade;
-            if (this.distanciaPercorrida >= pista.distanciaTotal){
+            if (random.nextInt(0,3) == 0) {
+                velocidade = random.nextInt(40, 120);
+                vezesSemPassarBox = 0;
+                System.out.println(identificacaoCarro + " passou no pitstop");
+                if (velocidade > 100) {
+                    System.out.println(identificacaoCarro + " ultrapassou o limite de velocidade no pitstop! Penalidade aplicada.");
+                    try {
+                        sleep(5000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                if (pista.safetyCarRodando){
+                    velocidade = 60;
+                } else {
+                    velocidade = gerarVelocidade();
+                }
+                System.out.println("> "+ identificacaoCarro + " km/h="+ velocidade);
+                vezesSemPassarBox++;
+            }
+
+            distanciaPercorrida += velocidade;
+            if (distanciaPercorrida >= pista.distanciaTotal){
                 System.out.println(identificacaoCarro + " finalizou corrida");
+                pista.adicionarCarroFinalizado(identificacaoCarro);
                 break;
             }
 
-            if (random.nextInt(0,1) == 0) {
-                this.vezesSemPassarBox = 0;
-            }
-
-            if (this.vezesSemPassarBox > 2) {
+            if (vezesSemPassarBox > 9) {
                 System.out.println("> " + identificacaoCarro + " quebrou!");
+                pista.adicionarCarroQuebrado(identificacaoCarro);
+
                 // avisar pista que safety car vai rodar
-                pista.notify();
+                synchronized (pista) {
+                    pista.ativarSafetyCar();
+                }
                 break;
             }
 
@@ -59,6 +76,6 @@ public class Carro implements Runnable{
     }
 
     public int gerarVelocidade() {
-        return this.random.nextInt(100,360);
+        return random.nextInt(100,360);
     }
 }
